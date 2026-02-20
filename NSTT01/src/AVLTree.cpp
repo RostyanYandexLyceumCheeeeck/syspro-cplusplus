@@ -5,7 +5,7 @@
 
 
 AVLTree::AVLTree() {
-    root_ = nullptr;
+    AVLTree(nullptr);
 }
  
 AVLTree::AVLTree(AVLTree::TreeNode* root) {

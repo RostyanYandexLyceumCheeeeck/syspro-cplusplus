@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include "headers/AVLTree.h"
 
+
 class AVLTreeTest : public ::testing::Test {
 protected:
     AVLTree tree;
-
 };
 
 TEST_F(AVLTreeTest, IsEmpty) {
