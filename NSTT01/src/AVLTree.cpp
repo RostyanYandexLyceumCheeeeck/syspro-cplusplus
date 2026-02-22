@@ -59,7 +59,7 @@ AVLTree::TreeNode* AVLTree::predPrivate(AVLTree::TreeNode* node) {
     
     AVLTree::TreeNode* par_min = node;
     AVLTree::TreeNode* left_max = max(node->left);
-    while (par_min->parent && par_min->parent->val >= par_min->val) {
+    while (par_min->parent && par_min->parent->val >= node->val) {
         par_min = par_min->parent;
     }
     
@@ -77,8 +77,8 @@ AVLTree::TreeNode* AVLTree::succPrivate(AVLTree::TreeNode* node) {
     if (!node) { return nullptr; }
     
     AVLTree::TreeNode* par_max = node;
-    AVLTree::TreeNode* right_min = max(node->left);
-    while (par_max->parent && par_max->parent->val <= par_max->val) {
+    AVLTree::TreeNode* right_min = min(node->right);
+    while (par_max->parent && par_max->parent->val <= node->val) {
         par_max = par_max->parent;
     }
     
@@ -93,7 +93,7 @@ AVLTree::TreeNode* AVLTree::succPrivate(AVLTree::TreeNode* node) {
 }
 
 AVLTree::TreeNode* AVLTree::insert(AVLTree::TreeNode* root, int val) {
-    if (!root) { return new AVLTree::TreeNode(val); }
+    if (!root) { return createNode(val); }
 
     if (val < root->val) {
         linked2Node(root, insert(root->left, val), true);
@@ -267,6 +267,19 @@ void AVLTree::printTree() {
     printTree(root_, 0);
     std::cout << std::endl;
 }
+
+AVLTree::TreeNode* AVLTree::createNode(int v) {
+    return new AVLTree::TreeNode(v);
+}
+
+int AVLTree::getValueNode(AVLTree::TreeNode* node) {
+    return (!node) ? 0 : node->val;
+}
+
+void AVLTree::setValueNode(AVLTree::TreeNode* node, int v) {
+    if (node) { node->val = v; }
+}
+
 
 AVLTree::~AVLTree() {
     rmTree(root_);

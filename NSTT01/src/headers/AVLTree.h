@@ -2,13 +2,17 @@
 #define AVLTree_H_
 
 class AVLTree {
-public:
-    struct TreeNode;
-
-    AVLTree();
-    AVLTree(TreeNode* root);
-
 private:
+    struct TreeNode {
+        int val;
+        int height;
+        TreeNode* left;
+        TreeNode* right;
+        TreeNode* parent;
+
+        TreeNode(int x): val(x), height(1), left(nullptr), right(nullptr), parent(nullptr) {}
+    };
+
     TreeNode* root_;
 
     TreeNode* find(TreeNode* root, int val);
@@ -35,27 +39,26 @@ private:
     void printTree(TreeNode* root, unsigned int counter);
 
 public:
-    struct TreeNode {
-        int val;
-        int height;
-        TreeNode* left;
-        TreeNode* right;
-        TreeNode* parent;
+    using Node = TreeNode;
 
-        TreeNode(int x): val(x), height(1), left(nullptr), right(nullptr), parent(nullptr) {}
-    };
+    AVLTree();
+    AVLTree(Node* root);
 
-    TreeNode* find(int val);
-    TreeNode* min();
-    TreeNode* max();
-    TreeNode* pred(TreeNode* node);
-    TreeNode* succ(TreeNode* node);
+    Node* find(int val);
+    Node* min();
+    Node* max();
+    Node* pred(Node* node);
+    Node* succ(Node* node);
     void insert(int val);
     void remove(int val);
 
     bool isEmpty(); 
     int getHeight();
     void printTree();
+
+    Node* createNode(int v);
+    int getValueNode(Node* node);
+    void setValueNode(Node* node, int v);
 
     ~AVLTree();
 };
