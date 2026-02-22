@@ -4,13 +4,9 @@
 #include <algorithm>
 
 
-AVLTree::AVLTree() {
-    AVLTree(nullptr);
-}
+AVLTree::AVLTree() : AVLTree(nullptr) { }
  
-AVLTree::AVLTree(AVLTree::TreeNode* root) {
-    root_ = root;
-}
+AVLTree::AVLTree(AVLTree::TreeNode* root) : root_(root) { }
 
 AVLTree::TreeNode* AVLTree::find(int val) {
     return find(root_, val); 
