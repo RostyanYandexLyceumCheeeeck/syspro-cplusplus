@@ -3,17 +3,19 @@
 
 class AVLTree {
 private:
-    struct TreeNode {
-        int val;
-        int height;
-        TreeNode* left;
-        TreeNode* right;
-        TreeNode* parent;
+    class TreeNode {
+        int val_ = 0;
+        int height_ = 0;
+        TreeNode* left_ = nullptr;
+        TreeNode* right_ = nullptr;
+        TreeNode* parent_ = nullptr;
 
-        TreeNode(int x): val(x), height(1), left(nullptr), right(nullptr), parent(nullptr) {}
+        TreeNode();
+        TreeNode(int x = 0): val_(x), height_(1) {}
+        friend class AVLTree;
     };
 
-    TreeNode* root_;
+    TreeNode* root_ = nullptr;
 
     TreeNode* find(TreeNode* root, int val);
     TreeNode* min(TreeNode* root);
@@ -21,7 +23,7 @@ private:
     TreeNode* predPrivate(TreeNode* node);
     TreeNode* succPrivate(TreeNode* node);
     TreeNode* insert(TreeNode* root, int val);
-    TreeNode* remove(TreeNode* root, int val);
+    TreeNode* removePrivate(int val);
 
     TreeNode* bubbleRotationExecutor(TreeNode* root);
     TreeNode* rotationExecutor(TreeNode* root);
@@ -35,30 +37,22 @@ private:
     void linked2Node(TreeNode* father, TreeNode* baby, bool leftward);
 
     void rmTree(TreeNode* root);
-
     void printTree(TreeNode* root, unsigned int counter);
 
 public:
-    using Node = TreeNode;
+    AVLTree() = default;
 
-    AVLTree();
-    AVLTree(Node* root);
-
-    Node* find(int val);
-    Node* min();
-    Node* max();
-    Node* pred(Node* node);
-    Node* succ(Node* node);
+    bool find(int val);
+    int min();
+    int max();
+    int pred(int val);
+    int succ(int val);
     void insert(int val);
     void remove(int val);
 
     bool isEmpty(); 
     int getHeight();
     void printTree();
-
-    Node* createNode(int v);
-    int getValueNode(Node* node);
-    void setValueNode(Node* node, int v);
 
     ~AVLTree();
 };

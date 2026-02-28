@@ -4,28 +4,28 @@
 #include <algorithm>
 
 
-AVLTree::AVLTree() : AVLTree(nullptr) { }
- 
-AVLTree::AVLTree(AVLTree::TreeNode* root) : root_(root) { }
-
-AVLTree::TreeNode* AVLTree::find(int val) {
-    return find(root_, val); 
+bool AVLTree::find(int val) {
+    return (bool) find(root_, val);
 }
 
-AVLTree::TreeNode* AVLTree::min() {
-    return min(root_);
+int AVLTree::min() {
+    TreeNode* node = min(root_);
+    return node ? node->val_ : 0; 
 }
 
-AVLTree::TreeNode* AVLTree::max() {
-    return max(root_);
+int AVLTree::max() {
+    TreeNode* node = max(root_);
+    return node ? node->val_ : 0; 
 }
 
-AVLTree::TreeNode* AVLTree::pred(AVLTree::TreeNode* node) {
-    return predPrivate(node);
+int AVLTree::pred(int val) {
+    TreeNode* node = predPrivate(find(root_, val));
+    return node ? node->val_ : 0;
 }
 
-AVLTree::TreeNode* AVLTree::succ(AVLTree::TreeNode* node) {
-    return succPrivate(node);
+int AVLTree::succ(int val) {
+    TreeNode* node = succPrivate(find(root_, val));
+    return node ? node->val_ : 0;
 }
 
 void AVLTree::insert(int val) {
@@ -33,126 +33,105 @@ void AVLTree::insert(int val) {
 }
 
 void AVLTree::remove(int val) {
-    root_ = remove(root_, val);
+    // root_ = remove(root_, val);
+    root_ = removePrivate(val);
 }
 
 AVLTree::TreeNode* AVLTree::find(AVLTree::TreeNode* root, int val) {
     if (!root) { return nullptr; }
     
-    if (val == root->val) { return root; }
-    if (val < root->val) { return find(root->left, val); }
-    return find(root->right, val);
+    if (val == root->val_) { return root; }
+    if (val < root->val_) { return find(root->left_, val); }
+    return find(root->right_, val);
 }
 
 AVLTree::TreeNode* AVLTree::min(AVLTree::TreeNode* root) {
-    if (!root || !root->left) { return root; }
-    return min(root->left);
+    if (!root || !root->left_) { return root; }
+    return min(root->left_);
 }
 
 AVLTree::TreeNode* AVLTree::max(AVLTree::TreeNode* root) {
-    if (!root || !root->right) { return root; }
-    return max(root->right);
+    if (!root || !root->right_) { return root; }
+    return max(root->right_);
 }
 
 AVLTree::TreeNode* AVLTree::predPrivate(AVLTree::TreeNode* node) {
     if (!node) { return nullptr; }
     
     AVLTree::TreeNode* par_min = node;
-    AVLTree::TreeNode* left_max = max(node->left);
-    while (par_min->parent && par_min->parent->val >= node->val) {
-        par_min = par_min->parent;
+    AVLTree::TreeNode* left_max = max(node->left_);
+    while (par_min->parent_ && par_min->parent_->val_ >= node->val_) {
+        par_min = par_min->parent_;
     }
     
     if (left_max) {
-        if (par_min->parent && left_max->val < par_min->parent->val) {
-            return par_min->parent;
+        if (par_min->parent_ && left_max->val_ < par_min->parent_->val_) {
+            return par_min->parent_;
         }
-        if (left_max->val < node->val) { return left_max; }
+        if (left_max->val_ < node->val_) { return left_max; }
         return nullptr;
     }
-    return par_min->parent;
+    return par_min->parent_;
 }
 
 AVLTree::TreeNode* AVLTree::succPrivate(AVLTree::TreeNode* node) {
     if (!node) { return nullptr; }
     
     AVLTree::TreeNode* par_max = node;
-    AVLTree::TreeNode* right_min = min(node->right);
-    while (par_max->parent && par_max->parent->val <= node->val) {
-        par_max = par_max->parent;
+    AVLTree::TreeNode* right_min = min(node->right_);
+    while (par_max->parent_ && par_max->parent_->val_ <= node->val_) {
+        par_max = par_max->parent_;
     }
     
     if (right_min) {
-        if (par_max->parent && right_min->val > par_max->parent->val) {
-            return par_max->parent;
+        if (par_max->parent_ && right_min->val_ > par_max->parent_->val_) {
+            return par_max->parent_;
         }
-        if (right_min->val > node->val) { return right_min; }
+        if (right_min->val_ > node->val_) { return right_min; }
         return nullptr;
     }
-    return par_max->parent;
+    return par_max->parent_;
 }
 
 AVLTree::TreeNode* AVLTree::insert(AVLTree::TreeNode* root, int val) {
-    if (!root) { return createNode(val); }
+    if (!root) { return new TreeNode(val); }
 
-    if (val < root->val) {
-        linked2Node(root, insert(root->left, val), true);
-        // root->left = insert(root->right, val);
-        // root->left->parent = root;
+    if (val < root->val_) {
+        linked2Node(root, insert(root->left_, val), true);
     } else {
-        linked2Node(root, insert(root->right, val), false);
-        // root->right = insert(root->right, val);
-        // root->right->parent = root;
+        linked2Node(root, insert(root->right_, val), false);
     }
     return rotationExecutor(root);
 }
 
-AVLTree::TreeNode* AVLTree::remove(AVLTree::TreeNode* root, int val) {
-    if (!root) { return nullptr; }
+AVLTree::TreeNode* AVLTree::removePrivate(int val) {
+    TreeNode* target = find(root_, val);
+    if (!target) { return root_; }
 
-    if (val == root->val) {
-        AVLTree::TreeNode* baby = nullptr;
-        if (root->left && root->right) {
-            baby = min(root->right);
+    AVLTree::TreeNode* baby = target;
+    if (target->left_ && target->right_) { 
+        baby = min(target->right_); 
+        linked2Node(baby->parent_, baby->right_, (baby != target->right_)); 
+    } else if (target->right_) { 
+        baby = target->right_; 
+    } else if (target->left_) { 
+        baby = target->left_; 
+    } 
+    // baby = t OR min(t.r) OR t.r OR t.l
 
-            // root->left->parent = baby;
-            // root->right->parent = baby;
-            // linkGrandfatherGrandson(baby, baby->right);
-            // baby->left = root->left;
-            // baby->right = root->right;
+    target->val_ = baby->val_;
+    AVLTree::TreeNode* par_baby = baby->parent_;
+    if (par_baby) { linked2Node(par_baby, nullptr, (par_baby->left_ == baby)); }
 
-            linked2Node(baby->parent, baby->right, true);
-            bubbleRotationExecutor(baby->parent);
-            linked2Node(baby, root->left, true);
-            linked2Node(baby, root->right, false);
-
-        } else if (root->left) {
-            baby = root->left;
-        } else if (root->right) {
-            baby = root->right;
-        }
-
-        delete root;
-        return rotationExecutor(baby); 
-    }
-
-    if (val < root->val) {
-        linked2Node(root, remove(root->left, val), true); 
-    } else {
-        linked2Node(root, remove(root->right, val), false); 
-    }
-    return rotationExecutor(root); 
+    delete baby;
+    return bubbleRotationExecutor(par_baby);
 }
 
 AVLTree::TreeNode* AVLTree::bubbleRotationExecutor(AVLTree::TreeNode* root) {
     if (!root) { return nullptr; }
 
     AVLTree::TreeNode* upd_root = rotationExecutor(root);
-    if (root->parent) { 
-        linked2Node(root->parent, upd_root, (root->parent->left == root)); 
-        return bubbleRotationExecutor(upd_root->parent);
-    }
-    return upd_root;
+    return upd_root->parent_ ? bubbleRotationExecutor(upd_root->parent_) : upd_root;
 }
 
 AVLTree::TreeNode* AVLTree::rotationExecutor(AVLTree::TreeNode* root) {
@@ -160,99 +139,105 @@ AVLTree::TreeNode* AVLTree::rotationExecutor(AVLTree::TreeNode* root) {
 
     int balance = getBalance(root);
     if (balance == 2) {
-        root = ((getBalance(root->right) == -1) ? 
+        root = ((getBalance(root->right_) == -1) ? 
                 bigLeftRotation(root) : 
                 miniLeftRotation(root));
     } else if (balance == -2) {
-        root = ((getBalance(root->left) == +1) ? 
+        root = ((getBalance(root->left_) == +1) ? 
                 bigRightRotation(root) : 
                 miniRightRotation(root));
     }
 
-    root->height = getHeight(root);
+    root->height_ = getHeight(root);
     return root;
 }
 
 AVLTree::TreeNode* AVLTree::bigLeftRotation(AVLTree::TreeNode* root) {
-    // root->right = miniRightRotation(root->right);
-    linked2Node(root, miniRightRotation(root->right), false);
+    // linked2Node(root, miniRightRotation(root->right_), false);
+    miniRightRotation(root->right_);
     return miniLeftRotation(root);
 }
 
 AVLTree::TreeNode* AVLTree::bigRightRotation(AVLTree::TreeNode* root) {
-    // root->left = miniLeftRotation(root->left);
-    linked2Node(root, miniLeftRotation(root->left), true);
+    // linked2Node(root, miniLeftRotation(root->left_), true);
+    miniLeftRotation(root->left_);
     return miniRightRotation(root);
 }
 
 AVLTree::TreeNode* AVLTree::miniLeftRotation(AVLTree::TreeNode* root) {
-    root->height--;
-    root->right->height++;
-
-    AVLTree::TreeNode* upd_root = root->right;
-    // root->right = root->right->left;
-    // upd_root->left = root;
-    upd_root->parent = root->parent;
-    linked2Node(root, upd_root->left, false);
+    root->height_--;
+    root->right_->height_++;
+    
+    // save pointers
+    AVLTree::TreeNode* old_par = root->parent_;
+    AVLTree::TreeNode* upd_root = root->right_;
+    bool leftward = (old_par && old_par->left_ == root);
+    
+    upd_root->parent_ = old_par;
+    linked2Node(root, upd_root->left_, false);
     linked2Node(upd_root, root, true);
-
+    linked2Node(old_par, upd_root, leftward);
+    
     return upd_root;
 }
 
 AVLTree::TreeNode* AVLTree::miniRightRotation(AVLTree::TreeNode* root) {
-    root->height--;
-    root->left->height++;
+    root->height_--;
+    root->left_->height_++;
 
-    AVLTree::TreeNode* upd_root = root->left;
-    // root->left = root->left->right;
-    // upd_root->right = root;
-    upd_root->parent = root->parent;
-    linked2Node(root, upd_root->right, true);
+    // save pointers
+    AVLTree::TreeNode* old_par = root->parent_;
+    AVLTree::TreeNode* upd_root = root->left_;
+    bool leftward = (old_par && old_par->left_ == root);
+
+    upd_root->parent_ = old_par;
+    linked2Node(root, upd_root->right_, true);
     linked2Node(upd_root, root, false);
+    linked2Node(old_par, upd_root, leftward);
 
     return upd_root;
 }
 
 int AVLTree::getHeight(AVLTree::TreeNode* root) {
     if (!root) { return 0; }
-    int lh = ((!root->left)  ? 0 : root->left->height);     // height left
-    int rh = ((!root->right) ? 0 : root->right->height);    // height right
+    int lh = ((!root->left_)  ? 0 : root->left_->height_);     // height left
+    int rh = ((!root->right_) ? 0 : root->right_->height_);    // height right
     return (lh > rh ? lh : rh) + 1;
 }
 
 int AVLTree::getBalance(AVLTree::TreeNode* root) {
     if (!root) { return 0; }
-    return getHeight(root->right) - getHeight(root->left);
+    return getHeight(root->right_) - getHeight(root->left_);
 }
 
 void AVLTree::linked2Node(AVLTree::TreeNode* father, AVLTree::TreeNode* baby, bool leftward) {
     if (!father) { return; }
 
     if (leftward) {
-        father->left = baby;
+        father->left_ = baby;
     } else {
-        father->right = baby;
+        father->right_ = baby;
     }
     
-    if (baby) { baby->parent = father; } 
+    if (baby) { baby->parent_ = father; } 
 }
 
 void AVLTree::printTree(AVLTree::TreeNode* root, unsigned int counter) {
     if (!root) { return; }
     std::string st(counter, '|');
-    std::cout << st << ' ' << root->val << " {" << std::endl;
+    std::cout << st << ' ' << root->val_ << " {" << std::endl;
     std::cout << st << "left: " << std::endl;
-    printTree(root->left, counter+1);
+    printTree(root->left_, counter+1);
     std::cout << st << "right: " << std::endl;
-    printTree(root->right, counter+1);
+    printTree(root->right_, counter+1);
     std::cout << st << ' ' << " }" << std::endl;
 }
 
 void AVLTree::rmTree(AVLTree::TreeNode* root) {
-        if (!root) { return; }
-        rmTree(root->left);
-        rmTree(root->right);
-        delete root;
+    if (!root) { return; }
+    rmTree(root->left_);
+    rmTree(root->right_);
+    delete root;
     }
 
 bool AVLTree::isEmpty() {
@@ -267,19 +252,6 @@ void AVLTree::printTree() {
     printTree(root_, 0);
     std::cout << std::endl;
 }
-
-AVLTree::TreeNode* AVLTree::createNode(int v) {
-    return new AVLTree::TreeNode(v);
-}
-
-int AVLTree::getValueNode(AVLTree::TreeNode* node) {
-    return (!node) ? 0 : node->val;
-}
-
-void AVLTree::setValueNode(AVLTree::TreeNode* node, int v) {
-    if (node) { node->val = v; }
-}
-
 
 AVLTree::~AVLTree() {
     rmTree(root_);
