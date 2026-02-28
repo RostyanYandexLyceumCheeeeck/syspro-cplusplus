@@ -4,6 +4,7 @@ file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false *.h *.cpp)
 
 set(SOURCES ${TEST_SOURCES})
 
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -17,6 +18,9 @@ FetchContent_MakeAvailable(googletest)
 find_package(GTest)
 
 add_executable(${BINARY} ${TEST_SOURCES})
+
+target_compile_options(${BINARY} PRIVATE -g -O0 -fsanitize=address)
+target_link_options(${BINARY} PRIVATE -fsanitize=address)
 
 gtest_discover_tests(${BINARY})
 

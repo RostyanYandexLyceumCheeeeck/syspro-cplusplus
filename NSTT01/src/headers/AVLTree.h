@@ -10,8 +10,13 @@ private:
         TreeNode* right_ = nullptr;
         TreeNode* parent_ = nullptr;
 
-        TreeNode();
-        TreeNode(int x = 0): val_(x), height_(1) {}
+        TreeNode() = default;
+        TreeNode(const TreeNode& other);
+        TreeNode(int x): val_(x), height_(1) {}
+        void init(const TreeNode& other);
+
+        TreeNode& operator=(const TreeNode& other);
+        ~TreeNode();
         friend class AVLTree;
     };
 
@@ -36,7 +41,6 @@ private:
     int getBalance(TreeNode* root);
     void linked2Node(TreeNode* father, TreeNode* baby, bool leftward);
 
-    void rmTree(TreeNode* root);
     void printTree(TreeNode* root, unsigned int counter);
 
 public:
@@ -54,6 +58,8 @@ public:
     int getHeight();
     void printTree();
 
+    AVLTree(const AVLTree& other);
+    AVLTree& operator=(const AVLTree& other);
     ~AVLTree();
 };
 

@@ -4,6 +4,39 @@
 #include <algorithm>
 
 
+void AVLTree::TreeNode::init(const TreeNode& other) {
+    val_ = other.val_;
+    height_ = other.height_;
+    
+    left_ = other.left_     ? new AVLTree::TreeNode(*other.left_)   : nullptr; 
+    right_ = other.right_   ? new AVLTree::TreeNode(*other.right_)  : nullptr;
+    parent_ = other.parent_ ? new AVLTree::TreeNode(*other.parent_) : nullptr;
+}
+
+AVLTree::TreeNode::TreeNode(const TreeNode& other) {
+    init(other);
+}
+
+AVLTree::TreeNode& AVLTree::TreeNode::operator=(const TreeNode& other) {
+    if (left_)   { left_->parent_ = nullptr; delete left_; }
+    if (right_)  { right_->parent_ = nullptr; delete right_; }
+    if (parent_) { 
+        parent_->left_ = (parent_->left_ == this) ? nullptr : parent_->left_; 
+        parent_->right_ = (parent_->right_ == this) ? nullptr : parent_->right_; 
+        delete parent_; 
+    }
+    
+    init(other);
+    return *this;
+}
+
+AVLTree::TreeNode::~TreeNode() {
+    AVLTree::TreeNode* old_parent = parent_;
+    if (parent_) { parent_ = nullptr; delete old_parent; } 
+    if (left_)   { left_->parent_ = nullptr; delete left_; } 
+    if (right_)  { right_->parent_ = nullptr; delete right_; }
+}
+
 bool AVLTree::find(int val) {
     return (bool) find(root_, val);
 }
@@ -123,6 +156,9 @@ AVLTree::TreeNode* AVLTree::removePrivate(int val) {
     AVLTree::TreeNode* par_baby = baby->parent_;
     if (par_baby) { linked2Node(par_baby, nullptr, (par_baby->left_ == baby)); }
 
+    baby->left_ = nullptr;
+    baby->right_ = nullptr;
+    baby->parent_ = nullptr;
     delete baby;
     return bubbleRotationExecutor(par_baby);
 }
@@ -233,13 +269,6 @@ void AVLTree::printTree(AVLTree::TreeNode* root, unsigned int counter) {
     std::cout << st << ' ' << " }" << std::endl;
 }
 
-void AVLTree::rmTree(AVLTree::TreeNode* root) {
-    if (!root) { return; }
-    rmTree(root->left_);
-    rmTree(root->right_);
-    delete root;
-    }
-
 bool AVLTree::isEmpty() {
     return (!root_);
 } 
@@ -253,6 +282,17 @@ void AVLTree::printTree() {
     std::cout << std::endl;
 }
 
+AVLTree::AVLTree(const AVLTree& other) {
+    root_ = new AVLTree::TreeNode(*other.root_);
+}
+
+AVLTree& AVLTree::operator=(const AVLTree& other) {
+    delete root_;
+    root_ = new AVLTree::TreeNode(*other.root_);
+    return *this;
+}
+
 AVLTree::~AVLTree() {
-    rmTree(root_);
+    if (!root_) { return; }
+    delete root_;
 }

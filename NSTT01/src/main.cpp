@@ -4,5 +4,6 @@
 int main() {
     AVLTree tree;
     tree.isEmpty();
+    // int* p = new int;
     return 0;
 }
