@@ -11,12 +11,16 @@ private:
         TreeNode* parent_ = nullptr;
 
         TreeNode() = default;
-        TreeNode(const TreeNode& other);
         TreeNode(int x): val_(x), height_(1) {}
-        void init(const TreeNode& other);
-
-        TreeNode& operator=(const TreeNode& other);
-        ~TreeNode();
+        
+        TreeNode(TreeNode&& other);
+        TreeNode(const TreeNode& other): val_(other.val_), height_(other.height_), 
+                                         left_(other.left_), right_(other.right_), parent_(other.parent_) {}
+        
+        TreeNode& operator=(TreeNode&& other);
+        TreeNode& operator=(const TreeNode& other) = delete;
+        
+        ~TreeNode() = default;
         friend class AVLTree;
     };
 
@@ -45,7 +49,12 @@ private:
 
 public:
     AVLTree() = default;
+    AVLTree(AVLTree&& other);
+    AVLTree(const AVLTree& other);
 
+    AVLTree& operator=(AVLTree&& other);
+    AVLTree& operator=(const AVLTree& other);
+    
     bool find(int val);
     int min();
     int max();
@@ -57,9 +66,9 @@ public:
     bool isEmpty(); 
     int getHeight();
     void printTree();
-
-    AVLTree(const AVLTree& other);
-    AVLTree& operator=(const AVLTree& other);
+    
+    void AVLTree::recursiveDelete(AVLTree::TreeNode* root);
+    AVLTree::TreeNode* recursiveCopied(AVLTree::TreeNode* node, const AVLTree::TreeNode& other);
     ~AVLTree();
 };
 

@@ -4,38 +4,49 @@
 #include <algorithm>
 
 
-void AVLTree::TreeNode::init(const TreeNode& other) {
-    val_ = other.val_;
-    height_ = other.height_;
-    
-    left_ = other.left_     ? new AVLTree::TreeNode(*other.left_)   : nullptr; 
-    right_ = other.right_   ? new AVLTree::TreeNode(*other.right_)  : nullptr;
-    parent_ = other.parent_ ? new AVLTree::TreeNode(*other.parent_) : nullptr;
-}
-
-AVLTree::TreeNode::TreeNode(const TreeNode& other) {
-    init(other);
-}
-
-AVLTree::TreeNode& AVLTree::TreeNode::operator=(const TreeNode& other) {
-    if (left_)   { left_->parent_ = nullptr; delete left_; }
-    if (right_)  { right_->parent_ = nullptr; delete right_; }
-    if (parent_) { 
-        parent_->left_ = (parent_->left_ == this) ? nullptr : parent_->left_; 
-        parent_->right_ = (parent_->right_ == this) ? nullptr : parent_->right_; 
-        delete parent_; 
+// =============== TreeNode ctor`s and optor`s  =============== 
+AVLTree::TreeNode::TreeNode(TreeNode&& other) {
+    if (this != &other) {
+        val_ = other.val_;
+        height_ = other.height_; 
+        std::swap(left_, other.left_); 
+        std::swap(right_, other.right_); 
+        std::swap(parent_, other.parent_); 
     }
-    
-    init(other);
+}
+
+AVLTree::TreeNode& AVLTree::TreeNode::operator=(TreeNode&& other) {
+    if (this != &other) { 
+        val_ = other.val_;
+        height_ = other.height_; 
+        std::swap(left_, other.left_); 
+        std::swap(right_, other.right_); 
+        std::swap(parent_, other.parent_); 
+    }
+    return *this;
+}
+// =^^^^^^^^^^^^^= TreeNode ctor`s and optor`s =^^^^^^^^^^^^^= 
+
+// =============== AVLTree ctor`s and optor`s  =============== 
+AVLTree::AVLTree(AVLTree&& other) {
+    if (this != &other) { std::swap(root_, other.root_); }
+}
+
+AVLTree::AVLTree(const AVLTree& other) {
+    root_ = other.root_ ? recursiveCopied(nullptr, *other.root_) : nullptr;
+}
+
+AVLTree& AVLTree::operator=(AVLTree&& other) {
+    if (this != &other) { std::swap(root_, other.root_); }
     return *this;
 }
 
-AVLTree::TreeNode::~TreeNode() {
-    AVLTree::TreeNode* old_parent = parent_;
-    if (parent_) { parent_ = nullptr; delete old_parent; } 
-    if (left_)   { left_->parent_ = nullptr; delete left_; } 
-    if (right_)  { right_->parent_ = nullptr; delete right_; }
+AVLTree& AVLTree::operator=(const AVLTree& other) {
+    recursiveDelete(root_);
+    root_ = other.root_ ? recursiveCopied(nullptr, *other.root_) : nullptr;
+    return *this;
 }
+// =^^^^^^^^^^^^^= AVLTree ctor`s and optor`s  =^^^^^^^^^^^^^= 
 
 bool AVLTree::find(int val) {
     return (bool) find(root_, val);
@@ -282,17 +293,24 @@ void AVLTree::printTree() {
     std::cout << std::endl;
 }
 
-AVLTree::AVLTree(const AVLTree& other) {
-    root_ = new AVLTree::TreeNode(*other.root_);
+void AVLTree::recursiveDelete(AVLTree::TreeNode* root) {
+    if (!root) { return; }
+
+    recursiveDelete(root->left_);
+    recursiveDelete(root->right_);
+    delete root;
 }
 
-AVLTree& AVLTree::operator=(const AVLTree& other) {
-    delete root_;
-    root_ = new AVLTree::TreeNode(*other.root_);
-    return *this;
+AVLTree::TreeNode* AVLTree::recursiveCopied(AVLTree::TreeNode* father, const AVLTree::TreeNode& other) {
+    AVLTree::TreeNode* node = new AVLTree::TreeNode(other);
+
+    node->parent_ = father;
+    node->left_ = other.left_ ? recursiveCopied(node, *other.left_) : nullptr;
+    node->right_ = other.right_ ? recursiveCopied(node, *other.right_) : nullptr;
+    return node;
 }
 
 AVLTree::~AVLTree() {
     if (!root_) { return; }
-    delete root_;
+    recursiveDelete(root_);
 }
