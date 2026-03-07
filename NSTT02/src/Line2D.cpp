@@ -50,4 +50,4 @@ bool Line2D::checkParallelizmPrivate(const Line2D& l) const {
         (a_*l.b()*l.c() == b_*l.a()*l.c())  &&  // -- = -- = --  <=> A1*B2*C2 = B1*A2*C2 = C1*A2*B2
         (b_*l.a()*l.c() == c_*l.a()*l.b())      // A2   B2   C2
     );
-}
+} // testing pull-request
