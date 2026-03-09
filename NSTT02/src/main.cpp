@@ -5,10 +5,11 @@
 
 
 int main() {
-    Line2D q = Line2D(-1./2, -2./2, -3./2);
-    Line2D l = Line2D(1, 2, 3);
-   
-    std::cout << l.checkParallelizm(q) << std::endl;
-    std::cout << l.a() << " " << l.b() << " " << l.c() << std::endl;
+    std::optional<Line2D> q = Line2D::createLine(-1/2, -2/2, -3/2);
+    std::optional<Line2D> l = Line2D::createLine(1, 2, 3);
+    if (l && q) {
+        std::cout << l->checkParallelizm(q.value()) << std::endl;
+        std::cout << l->a() << " " << l->b() << " " << l->c() << std::endl;
+    }
     return 0;
 }
