@@ -1,6 +1,7 @@
 #ifndef AVLTree_H_
 #define AVLTree_H_
 
+
 class AVLTree {
 private:
     class TreeNode {
@@ -67,8 +68,8 @@ public:
     int getHeight();
     void printTree();
     
-    void AVLTree::recursiveDelete(AVLTree::TreeNode* root);
-    AVLTree::TreeNode* recursiveCopied(AVLTree::TreeNode* node, const AVLTree::TreeNode& other);
+    void recursiveDelete(AVLTree::TreeNode* root);
+    TreeNode* recursiveCopied(AVLTree::TreeNode* node, const AVLTree::TreeNode& other);
     ~AVLTree();
 };
 

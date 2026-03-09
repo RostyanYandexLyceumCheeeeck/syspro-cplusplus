@@ -155,17 +155,20 @@ AVLTree::TreeNode* AVLTree::removePrivate(int val) {
     AVLTree::TreeNode* baby = target;
     if (target->left_ && target->right_) { 
         baby = min(target->right_); 
-        linked2Node(baby->parent_, baby->right_, (baby != target->right_)); 
     } else if (target->right_) { 
         baby = target->right_; 
     } else if (target->left_) { 
         baby = target->left_; 
-    } 
-    // baby = t OR min(t.r) OR t.r OR t.l
+    }// baby = t OR min(t.r) OR t.r OR t.l
 
     target->val_ = baby->val_;
     AVLTree::TreeNode* par_baby = baby->parent_;
-    if (par_baby) { linked2Node(par_baby, nullptr, (par_baby->left_ == baby)); }
+
+    if (baby != target) {
+        linked2Node(par_baby, baby->right_, (baby != target->right_));
+    } else if (target != root_) {
+        linked2Node(par_baby, baby->right_, (baby == par_baby->left_));
+    }
 
     baby->left_ = nullptr;
     baby->right_ = nullptr;
@@ -190,7 +193,7 @@ AVLTree::TreeNode* AVLTree::rotationExecutor(AVLTree::TreeNode* root) {
                 bigLeftRotation(root) : 
                 miniLeftRotation(root));
     } else if (balance == -2) {
-        root = ((getBalance(root->left_) == +1) ? 
+        root = ((getBalance(root->left_) == 1)   ? 
                 bigRightRotation(root) : 
                 miniRightRotation(root));
     }
@@ -229,8 +232,8 @@ AVLTree::TreeNode* AVLTree::miniLeftRotation(AVLTree::TreeNode* root) {
 }
 
 AVLTree::TreeNode* AVLTree::miniRightRotation(AVLTree::TreeNode* root) {
-    root->height_--;
-    root->left_->height_++;
+    // root->height_--;
+    // root->left_->height_++;
 
     // save pointers
     AVLTree::TreeNode* old_par = root->parent_;
@@ -242,6 +245,7 @@ AVLTree::TreeNode* AVLTree::miniRightRotation(AVLTree::TreeNode* root) {
     linked2Node(upd_root, root, false);
     linked2Node(old_par, upd_root, leftward);
 
+    root->height_ = getHeight(root);
     return upd_root;
 }
 
@@ -302,7 +306,10 @@ void AVLTree::recursiveDelete(AVLTree::TreeNode* root) {
 }
 
 AVLTree::TreeNode* AVLTree::recursiveCopied(AVLTree::TreeNode* father, const AVLTree::TreeNode& other) {
-    AVLTree::TreeNode* node = new AVLTree::TreeNode(other);
+    AVLTree::TreeNode* node = new AVLTree::TreeNode();
+
+    node->val_ = other.val_;
+    node->height_ = other.height_;
 
     node->parent_ = father;
     node->left_ = other.left_ ? recursiveCopied(node, *other.left_) : nullptr;
