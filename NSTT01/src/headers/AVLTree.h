@@ -1,19 +1,21 @@
-#ifndef AVLTree_H_
-#define AVLTree_H_
+#pragma once
+
+#include <iostream>
+#include <string>
 
 
+template <typename T>
 class AVLTree {
 private:
     class TreeNode {
-        int val_ = 0;
+        T val_ = 0;
         int height_ = 0;
         TreeNode* left_ = nullptr;
         TreeNode* right_ = nullptr;
         TreeNode* parent_ = nullptr;
 
         TreeNode() = default;
-        TreeNode(int x): val_(x), height_(1) {}
-        
+        TreeNode(T x): val_(x), height_(1) {}
         TreeNode(TreeNode&& other);
         TreeNode(const TreeNode& other): val_(other.val_), height_(other.height_), 
                                          left_(other.left_), right_(other.right_), parent_(other.parent_) {}
@@ -27,13 +29,13 @@ private:
 
     TreeNode* root_ = nullptr;
 
-    TreeNode* find(TreeNode* root, int val);
-    TreeNode* min(TreeNode* root);
-    TreeNode* max(TreeNode* root);
-    TreeNode* predPrivate(TreeNode* node);
-    TreeNode* succPrivate(TreeNode* node);
-    TreeNode* insert(TreeNode* root, int val);
-    TreeNode* removePrivate(int val);
+    TreeNode* find(TreeNode* root, T val) const;
+    TreeNode* min(TreeNode* root) const;
+    TreeNode* max(TreeNode* root) const;
+    TreeNode* predPrivate(TreeNode* node) const;
+    TreeNode* succPrivate(TreeNode* node) const;
+    TreeNode* insert(TreeNode* root, T val);
+    TreeNode* removePrivate(T val);
 
     TreeNode* bubbleRotationExecutor(TreeNode* root);
     TreeNode* rotationExecutor(TreeNode* root);
@@ -42,36 +44,36 @@ private:
     TreeNode* miniLeftRotation(TreeNode* root);
     TreeNode* miniRightRotation(TreeNode* root);
     
-    int getHeight(TreeNode* root);
-    int getBalance(TreeNode* root);
+    int getHeight(TreeNode* root) const;
+    int getBalance(TreeNode* root) const;
     void linked2Node(TreeNode* father, TreeNode* baby, bool leftward);
 
-    void printTree(TreeNode* root, unsigned int counter);
+    void recursiveDelete(TreeNode* root);
+    TreeNode* recursiveCopied(TreeNode* node, const TreeNode& other);
+
+    void printTree(TreeNode* root, unsigned int counter) const;
 
 public:
     AVLTree() = default;
-    AVLTree(AVLTree&& other);
     AVLTree(const AVLTree& other);
+    AVLTree(AVLTree&& other);
 
     AVLTree& operator=(AVLTree&& other);
     AVLTree& operator=(const AVLTree& other);
     
-    bool find(int val);
-    int min();
-    int max();
-    int pred(int val);
-    int succ(int val);
-    void insert(int val);
-    void remove(int val);
+    bool find(T val) const;
+    T min() const;
+    T max() const;
+    T pred(T val) const;
+    T succ(T val) const;
+    void insert(T val);
+    void remove(T val);
 
-    bool isEmpty(); 
-    int getHeight();
-    void printTree();
+    bool isEmpty() const; 
+    int getHeight() const;
+    void printTree() const;
     
-    void recursiveDelete(AVLTree::TreeNode* root);
-    TreeNode* recursiveCopied(AVLTree::TreeNode* node, const AVLTree::TreeNode& other);
     ~AVLTree();
 };
 
-
-#endif // AVLTree_H_
+#include "AVLTree.ipp" 

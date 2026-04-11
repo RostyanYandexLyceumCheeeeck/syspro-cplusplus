@@ -4,7 +4,7 @@
 
 class AVLTreeTest : public ::testing::Test {
 protected:
-    AVLTree tree;
+    AVLTree<int> tree;
 };
 
 TEST_F(AVLTreeTest, IsEmpty) {

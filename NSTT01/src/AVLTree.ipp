@@ -1,11 +1,9 @@
+#pragma once
 #include "headers/AVLTree.h"
-#include <iostream>
-#include <string>
-#include <algorithm>
-
 
 // =============== TreeNode ctor`s and optor`s  =============== 
-AVLTree::TreeNode::TreeNode(TreeNode&& other) {
+template <typename T>
+AVLTree<T>::TreeNode::TreeNode(AVLTree<T>::TreeNode&& other) {  
     if (this != &other) {
         val_ = other.val_;
         height_ = other.height_; 
@@ -15,7 +13,8 @@ AVLTree::TreeNode::TreeNode(TreeNode&& other) {
     }
 }
 
-AVLTree::TreeNode& AVLTree::TreeNode::operator=(TreeNode&& other) {
+template <typename T>
+AVLTree<T>::TreeNode& AVLTree<T>::TreeNode::operator=(TreeNode&& other) {
     if (this != &other) { 
         val_ = other.val_;
         height_ = other.height_; 
@@ -27,61 +26,33 @@ AVLTree::TreeNode& AVLTree::TreeNode::operator=(TreeNode&& other) {
 }
 // =^^^^^^^^^^^^^= TreeNode ctor`s and optor`s =^^^^^^^^^^^^^= 
 
-// =============== AVLTree ctor`s and optor`s  =============== 
-AVLTree::AVLTree(AVLTree&& other) {
+// =============== AVLTree<T> ctor`s and optor`s  =============== 
+template <typename T>
+AVLTree<T>::AVLTree(AVLTree<T>&& other) {
     if (this != &other) { std::swap(root_, other.root_); }
 }
 
-AVLTree::AVLTree(const AVLTree& other) {
+template <typename T>
+AVLTree<T>::AVLTree(const AVLTree<T>& other) {
     root_ = other.root_ ? recursiveCopied(nullptr, *other.root_) : nullptr;
 }
 
-AVLTree& AVLTree::operator=(AVLTree&& other) {
+template <typename T>
+AVLTree<T>& AVLTree<T>::operator=(AVLTree<T>&& other) {
     if (this != &other) { std::swap(root_, other.root_); }
     return *this;
 }
 
-AVLTree& AVLTree::operator=(const AVLTree& other) {
+template <typename T>
+AVLTree<T>& AVLTree<T>::operator=(const AVLTree<T>& other) {
     recursiveDelete(root_);
     root_ = other.root_ ? recursiveCopied(nullptr, *other.root_) : nullptr;
     return *this;
 }
-// =^^^^^^^^^^^^^= AVLTree ctor`s and optor`s  =^^^^^^^^^^^^^= 
+// =^^^^^^^^^^^^^= AVLTree<T> ctor`s and optor`s  =^^^^^^^^^^^^^= 
 
-bool AVLTree::find(int val) {
-    return (bool) find(root_, val);
-}
-
-int AVLTree::min() {
-    TreeNode* node = min(root_);
-    return node ? node->val_ : 0; 
-}
-
-int AVLTree::max() {
-    TreeNode* node = max(root_);
-    return node ? node->val_ : 0; 
-}
-
-int AVLTree::pred(int val) {
-    TreeNode* node = predPrivate(find(root_, val));
-    return node ? node->val_ : 0;
-}
-
-int AVLTree::succ(int val) {
-    TreeNode* node = succPrivate(find(root_, val));
-    return node ? node->val_ : 0;
-}
-
-void AVLTree::insert(int val) {
-    root_ = insert(root_, val);
-}
-
-void AVLTree::remove(int val) {
-    // root_ = remove(root_, val);
-    root_ = removePrivate(val);
-}
-
-AVLTree::TreeNode* AVLTree::find(AVLTree::TreeNode* root, int val) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::find(AVLTree<T>::TreeNode* root, T val) const {
     if (!root) { return nullptr; }
     
     if (val == root->val_) { return root; }
@@ -89,21 +60,24 @@ AVLTree::TreeNode* AVLTree::find(AVLTree::TreeNode* root, int val) {
     return find(root->right_, val);
 }
 
-AVLTree::TreeNode* AVLTree::min(AVLTree::TreeNode* root) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::min(AVLTree<T>::TreeNode* root) const {
     if (!root || !root->left_) { return root; }
     return min(root->left_);
 }
 
-AVLTree::TreeNode* AVLTree::max(AVLTree::TreeNode* root) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::max(AVLTree<T>::TreeNode* root) const {
     if (!root || !root->right_) { return root; }
     return max(root->right_);
 }
 
-AVLTree::TreeNode* AVLTree::predPrivate(AVLTree::TreeNode* node) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::predPrivate(AVLTree<T>::TreeNode* node) const {
     if (!node) { return nullptr; }
     
-    AVLTree::TreeNode* par_min = node;
-    AVLTree::TreeNode* left_max = max(node->left_);
+    AVLTree<T>::TreeNode* par_min = node;
+    AVLTree<T>::TreeNode* left_max = max(node->left_);
     while (par_min->parent_ && par_min->parent_->val_ >= node->val_) {
         par_min = par_min->parent_;
     }
@@ -118,11 +92,12 @@ AVLTree::TreeNode* AVLTree::predPrivate(AVLTree::TreeNode* node) {
     return par_min->parent_;
 }
 
-AVLTree::TreeNode* AVLTree::succPrivate(AVLTree::TreeNode* node) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::succPrivate(AVLTree<T>::TreeNode* node) const {
     if (!node) { return nullptr; }
     
-    AVLTree::TreeNode* par_max = node;
-    AVLTree::TreeNode* right_min = min(node->right_);
+    AVLTree<T>::TreeNode* par_max = node;
+    AVLTree<T>::TreeNode* right_min = min(node->right_);
     while (par_max->parent_ && par_max->parent_->val_ <= node->val_) {
         par_max = par_max->parent_;
     }
@@ -137,7 +112,8 @@ AVLTree::TreeNode* AVLTree::succPrivate(AVLTree::TreeNode* node) {
     return par_max->parent_;
 }
 
-AVLTree::TreeNode* AVLTree::insert(AVLTree::TreeNode* root, int val) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::insert(AVLTree<T>::TreeNode* root, T val) {
     if (!root) { return new TreeNode(val); }
 
     if (val < root->val_) {
@@ -148,11 +124,12 @@ AVLTree::TreeNode* AVLTree::insert(AVLTree::TreeNode* root, int val) {
     return rotationExecutor(root);
 }
 
-AVLTree::TreeNode* AVLTree::removePrivate(int val) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::removePrivate(T val) {
     TreeNode* target = find(root_, val);
     if (!target) { return root_; }
 
-    AVLTree::TreeNode* baby = target;
+    AVLTree<T>::TreeNode* baby = target;
     if (target->left_ && target->right_) { 
         baby = min(target->right_); 
     } else if (target->right_) { 
@@ -162,7 +139,7 @@ AVLTree::TreeNode* AVLTree::removePrivate(int val) {
     }// baby = t OR min(t.r) OR t.r OR t.l
 
     target->val_ = baby->val_;
-    AVLTree::TreeNode* par_baby = baby->parent_;
+    AVLTree<T>::TreeNode* par_baby = baby->parent_;
 
     if (baby != target) {
         linked2Node(par_baby, baby->right_, (baby != target->right_));
@@ -177,14 +154,16 @@ AVLTree::TreeNode* AVLTree::removePrivate(int val) {
     return bubbleRotationExecutor(par_baby);
 }
 
-AVLTree::TreeNode* AVLTree::bubbleRotationExecutor(AVLTree::TreeNode* root) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::bubbleRotationExecutor(AVLTree<T>::TreeNode* root) {
     if (!root) { return nullptr; }
 
-    AVLTree::TreeNode* upd_root = rotationExecutor(root);
+    AVLTree<T>::TreeNode* upd_root = rotationExecutor(root);
     return upd_root->parent_ ? bubbleRotationExecutor(upd_root->parent_) : upd_root;
 }
 
-AVLTree::TreeNode* AVLTree::rotationExecutor(AVLTree::TreeNode* root) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::rotationExecutor(AVLTree<T>::TreeNode* root) {
     if (!root) { return nullptr; }
 
     int balance = getBalance(root);
@@ -202,25 +181,28 @@ AVLTree::TreeNode* AVLTree::rotationExecutor(AVLTree::TreeNode* root) {
     return root;
 }
 
-AVLTree::TreeNode* AVLTree::bigLeftRotation(AVLTree::TreeNode* root) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::bigLeftRotation(AVLTree<T>::TreeNode* root) {
     // linked2Node(root, miniRightRotation(root->right_), false);
     miniRightRotation(root->right_);
     return miniLeftRotation(root);
 }
 
-AVLTree::TreeNode* AVLTree::bigRightRotation(AVLTree::TreeNode* root) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::bigRightRotation(AVLTree<T>::TreeNode* root) {
     // linked2Node(root, miniLeftRotation(root->left_), true);
     miniLeftRotation(root->left_);
     return miniRightRotation(root);
 }
 
-AVLTree::TreeNode* AVLTree::miniLeftRotation(AVLTree::TreeNode* root) {
-    root->height_--;
-    root->right_->height_++;
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::miniLeftRotation(AVLTree<T>::TreeNode* root) {
+    // root->height_--;
+    // root->right_->height_++;
     
     // save pointers
-    AVLTree::TreeNode* old_par = root->parent_;
-    AVLTree::TreeNode* upd_root = root->right_;
+    AVLTree<T>::TreeNode* old_par = root->parent_;
+    AVLTree<T>::TreeNode* upd_root = root->right_;
     bool leftward = (old_par && old_par->left_ == root);
     
     upd_root->parent_ = old_par;
@@ -228,16 +210,18 @@ AVLTree::TreeNode* AVLTree::miniLeftRotation(AVLTree::TreeNode* root) {
     linked2Node(upd_root, root, true);
     linked2Node(old_par, upd_root, leftward);
     
+    root->height_ = getHeight(root);
     return upd_root;
 }
 
-AVLTree::TreeNode* AVLTree::miniRightRotation(AVLTree::TreeNode* root) {
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::miniRightRotation(AVLTree<T>::TreeNode* root) {
     // root->height_--;
     // root->left_->height_++;
 
     // save pointers
-    AVLTree::TreeNode* old_par = root->parent_;
-    AVLTree::TreeNode* upd_root = root->left_;
+    AVLTree<T>::TreeNode* old_par = root->parent_;
+    AVLTree<T>::TreeNode* upd_root = root->left_;
     bool leftward = (old_par && old_par->left_ == root);
 
     upd_root->parent_ = old_par;
@@ -249,19 +233,22 @@ AVLTree::TreeNode* AVLTree::miniRightRotation(AVLTree::TreeNode* root) {
     return upd_root;
 }
 
-int AVLTree::getHeight(AVLTree::TreeNode* root) {
+template <typename T>
+int AVLTree<T>::getHeight(AVLTree<T>::TreeNode* root) const {
     if (!root) { return 0; }
     int lh = ((!root->left_)  ? 0 : root->left_->height_);     // height left
     int rh = ((!root->right_) ? 0 : root->right_->height_);    // height right
     return (lh > rh ? lh : rh) + 1;
 }
 
-int AVLTree::getBalance(AVLTree::TreeNode* root) {
+template <typename T>
+int AVLTree<T>::getBalance(AVLTree<T>::TreeNode* root) const {
     if (!root) { return 0; }
     return getHeight(root->right_) - getHeight(root->left_);
 }
 
-void AVLTree::linked2Node(AVLTree::TreeNode* father, AVLTree::TreeNode* baby, bool leftward) {
+template <typename T>
+void AVLTree<T>::linked2Node(AVLTree<T>::TreeNode* father, AVLTree<T>::TreeNode* baby, bool leftward) {
     if (!father) { return; }
 
     if (leftward) {
@@ -273,31 +260,8 @@ void AVLTree::linked2Node(AVLTree::TreeNode* father, AVLTree::TreeNode* baby, bo
     if (baby) { baby->parent_ = father; } 
 }
 
-void AVLTree::printTree(AVLTree::TreeNode* root, unsigned int counter) {
-    if (!root) { return; }
-    std::string st(counter, '|');
-    std::cout << st << ' ' << root->val_ << " {" << std::endl;
-    std::cout << st << "left: " << std::endl;
-    printTree(root->left_, counter+1);
-    std::cout << st << "right: " << std::endl;
-    printTree(root->right_, counter+1);
-    std::cout << st << ' ' << " }" << std::endl;
-}
-
-bool AVLTree::isEmpty() {
-    return (!root_);
-} 
-
-int AVLTree::getHeight() {
-    return getHeight(root_);
-}
-
-void AVLTree::printTree() {
-    printTree(root_, 0);
-    std::cout << std::endl;
-}
-
-void AVLTree::recursiveDelete(AVLTree::TreeNode* root) {
+template <typename T>
+void AVLTree<T>::recursiveDelete(AVLTree<T>::TreeNode* root) {
     if (!root) { return; }
 
     recursiveDelete(root->left_);
@@ -305,8 +269,9 @@ void AVLTree::recursiveDelete(AVLTree::TreeNode* root) {
     delete root;
 }
 
-AVLTree::TreeNode* AVLTree::recursiveCopied(AVLTree::TreeNode* father, const AVLTree::TreeNode& other) {
-    AVLTree::TreeNode* node = new AVLTree::TreeNode();
+template <typename T>
+AVLTree<T>::TreeNode* AVLTree<T>::recursiveCopied(AVLTree<T>::TreeNode* father, const AVLTree<T>::TreeNode& other) {
+    AVLTree<T>::TreeNode* node = new AVLTree<T>::TreeNode();
 
     node->val_ = other.val_;
     node->height_ = other.height_;
@@ -317,7 +282,77 @@ AVLTree::TreeNode* AVLTree::recursiveCopied(AVLTree::TreeNode* father, const AVL
     return node;
 }
 
-AVLTree::~AVLTree() {
+template <typename T>
+void AVLTree<T>::printTree(AVLTree<T>::TreeNode* root, unsigned int counter) const {
+    if (!root) { return; }
+    std::string st(counter, '|');
+    std::cout << st << ' ' << root->val_ << " {" << std::endl;
+    std::cout << st << "left: " << std::endl;
+    printTree(root->left_, counter+1);
+    std::cout << st << "right: " << std::endl;
+    printTree(root->right_, counter+1);
+    std::cout << st << ' ' << " }" << std::endl;
+}
+
+
+template <typename T>
+bool AVLTree<T>::find(T val) const {
+    return (bool) find(root_, val);
+}
+
+template <typename T>
+T AVLTree<T>::min() const {
+    TreeNode* node = min(root_);
+    return node ? node->val_ : T{}; 
+}
+
+template <typename T>
+T AVLTree<T>::max() const {
+    TreeNode* node = max(root_);
+    return node ? node->val_ : T{}; 
+}
+
+template <typename T>
+T AVLTree<T>::pred(T val) const {
+    TreeNode* node = predPrivate(find(root_, val));
+    return node ? node->val_ : T{};
+}
+
+template <typename T>
+T AVLTree<T>::succ(T val) const {
+    TreeNode* node = succPrivate(find(root_, val));
+    return node ? node->val_ : T{};
+}
+
+template <typename T>
+void AVLTree<T>::insert(T val) {
+    root_ = insert(root_, val);
+}
+
+template <typename T>
+void AVLTree<T>::remove(T val) {
+    // root_ = remove(root_, val);
+    root_ = removePrivate(val);
+}
+
+template <typename T>
+bool AVLTree<T>::isEmpty() const {
+    return (!root_);
+} 
+
+template <typename T>
+int AVLTree<T>::getHeight() const {
+    return getHeight(root_);
+}
+
+template <typename T>
+void AVLTree<T>::printTree() const {
+    printTree(root_, 0);
+    std::cout << std::endl;
+}
+
+template <typename T>
+AVLTree<T>::~AVLTree() {
     if (!root_) { return; }
     recursiveDelete(root_);
 }
