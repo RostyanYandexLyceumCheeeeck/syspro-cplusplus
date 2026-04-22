@@ -1,10 +1,11 @@
+#include <algorithm>
 #include <gtest/gtest.h>
 #include "headers/AVLTree.h"
 
 
 class AVLTreeTest : public ::testing::Test {
 protected:
-    AVLTree tree;
+    AVLTree<int> tree;
 };
 
 TEST_F(AVLTreeTest, IsEmpty) {
@@ -18,7 +19,7 @@ TEST_F(AVLTreeTest, InsertsElementsCorrectly) {
 }
 
 
-TEST_F(AVLTreeTest, RemovesElementsCorrectly) {
+TEST_F(AVLTreeTest, RemovesElementsCorrectly1) {
     for (int i = 0; i < 10; i++) {
         this->tree.insert(i);
     }
@@ -29,6 +30,17 @@ TEST_F(AVLTreeTest, RemovesElementsCorrectly) {
     }
 
     EXPECT_TRUE(this->tree.isEmpty());
+}
+
+TEST_F(AVLTreeTest, RemovesElementsCorrectly2) {
+    int arr[] = {8, 10, 12, 6, 16, 9, 11, 7, 5, 4};
+    for (int x: arr) {          //            ╔════════ 10 ════════╗
+        this->tree.insert(x);   //       ╔═══ 6 ═══╗    ||   ╔═══ 12 ═══╗
+    }                           //    ╔═ 5    | ╔═ 8 ═╗ ||   11   ||   16
+                                //    4  |    | 7  |  9 ||        ||
+    for (int x: arr) {
+        this->tree.remove(x);
+    }
 }
 
 
@@ -69,9 +81,9 @@ TEST_F(AVLTreeTest, GetsMaximumCorrectly) {
 }
 
 TEST_F(AVLTreeTest, GetsPredCorrectly) {
-    this->tree.insert(7);
-    this->tree.insert(3);
-    this->tree.insert(9);
+    this->tree.insert(7);           //      ╔══ 7 ══╗
+    this->tree.insert(3);           //   ╔═ 3   |   9 ═╗
+    this->tree.insert(9);           //   2  |   |   | 14 
     this->tree.insert(14);
     this->tree.insert(2);
 
@@ -82,7 +94,7 @@ TEST_F(AVLTreeTest, GetsPredCorrectly) {
     EXPECT_EQ(this->tree.pred(2), 0);
 }
 
-TEST_F(AVLTreeTest, RotationsCorrectly) {
+TEST_F(AVLTreeTest, RotationsCorrectly1) {
                                     //         ╔═════ 10 ═════╗
     this->tree.insert(8);           //    ╔═══ 8 ═══╗ || ╔═══ 12 ═══╗ 
     this->tree.insert(10);          //    6 ═╗ |    9 || 11    |   16
@@ -106,7 +118,65 @@ TEST_F(AVLTreeTest, RotationsCorrectly) {
                                     //    ╔═ 5    | ╔═ 8 ═╗ ||   11   ||   16
                                     //    4  |    | 7  |  9 ||        ||
 
-                            
+TEST_F(AVLTreeTest, RotationsCorrectly2) {
+                                    //         ╔═════ 10 ═════╗
+    this->tree.insert(8);           //    ╔═══ 8 ═══╗ | ╔═══ 12 ═══╗ 
+    this->tree.insert(10);          //    6 ═╗ |    9 | 11    |   16
+    this->tree.insert(12);          //    |  7 |      |       |
+    this->tree.insert(6);                       
+    this->tree.insert(16);          //         ╔═════ 10 ═════╗
+    this->tree.insert(9);           //    ╔═══ 8 ═══╗ | ╔═══ 12
+    this->tree.insert(11);          //    6 ═╗ |    9 | 11    |
+    this->tree.insert(7);           //    |  7 |      |       |
+
+    this->tree.remove(16);          //         ╔═════ 10 ═════╗
+    this->tree.remove(11);          //    ╔═══ 8 ═══╗ |      12
+                                    //    6 ═╗ |    9 | 
+                                    //    |  7 |      | 
+    EXPECT_EQ(tree.getHeight(), 3);
+}                                   //    ╔════ 8 ════╗
+                                    //    6 ═╗  | ╔═ 10 ═╗
+                                    //    |  7  | 9   | 12
+
+
+TEST_F(AVLTreeTest, IteratorCorrectly1) {
+    std::vector<int> arr = {8, 10, 12, 6, 16, 9, 11, 7, 5, 4};
+    for (int x: arr) {          //            ╔════════ 10 ════════╗
+        this->tree.insert(x);   //       ╔═══ 6 ═══╗    ||   ╔═══ 12 ═══╗
+    }                           //    ╔═ 5    | ╔═ 8 ═╗ ||   11   ||   16
+                                //    4  |    | 7  |  9 ||        ||
+    
+    
+    std::sort(arr.begin(), arr.end());
+    auto v_it = arr.begin();
+    auto v_end = arr.end();
+
+    auto t_it = tree.begin();
+    auto t_end = tree.end();
+
+    for (; t_it != t_end, v_it != v_end; ++v_it, ++t_it) {
+        EXPECT_EQ(*t_it, *v_it);
+    }
+}
+
+TEST_F(AVLTreeTest, IteratorCorrectly2) {
+    std::vector<int> arr = {8, 10, 12, 6, 16, 9, 11, 7, 5, 4};
+    for (int x: arr) {          //            ╔════════ 10 ════════╗
+        this->tree.insert(x);   //       ╔═══ 6 ═══╗    ||   ╔═══ 12 ═══╗
+    }                           //    ╔═ 5    | ╔═ 8 ═╗ ||   11   ||   16
+                                //    4  |    | 7  |  9 ||        ||
+    
+    
+    std::sort(arr.begin(), arr.end());
+    auto v_it = arr.begin();
+    auto v_end = arr.end();
+    
+    for (int value : tree) {
+        if (v_it == v_end) { ASSERT_FALSE(true); }
+        EXPECT_EQ(value, *(v_it++));
+    }
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
