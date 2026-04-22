@@ -27,20 +27,20 @@ private:
         friend class AVLTree;
     };
     
-    class Iterator {
+    class IteratorAVLTree {
         TreeNode* currentNode_ = nullptr;
 
     public:
-        Iterator(TreeNode* node = nullptr) : currentNode_(node) {}
+        IteratorAVLTree(TreeNode* node = nullptr) : currentNode_(node) {}
 
-        Iterator& operator++();
-        Iterator& operator++(int);
+        IteratorAVLTree& operator++();
+        IteratorAVLTree& operator++(int);
         
         T& operator*() { return currentNode_->val_; }
         T* operator->() { return &(currentNode_->val_); }
 
-        bool operator==(const Iterator& other) const { return currentNode_ == other.currentNode_; }
-        bool operator!=(const Iterator& other) const { return currentNode_ != other.currentNode_; }
+        bool operator==(const IteratorAVLTree& other) const { return currentNode_ == other.currentNode_; }
+        bool operator!=(const IteratorAVLTree& other) const { return currentNode_ != other.currentNode_; }
 };
 
     TreeNode* root_ = nullptr;
@@ -89,8 +89,8 @@ public:
     int getHeight() const;
     void printTree() const;
     
-    Iterator begin() const { return Iterator(min(root_)); }
-    Iterator end() const { return Iterator(nullptr); }
+    IteratorAVLTree begin() const { return IteratorAVLTree(min(root_)); }
+    IteratorAVLTree end() const { return IteratorAVLTree(nullptr); }
 
     ~AVLTree();
 };

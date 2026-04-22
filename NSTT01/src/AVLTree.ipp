@@ -26,9 +26,9 @@ AVLTree<T>::TreeNode& AVLTree<T>::TreeNode::operator=(TreeNode&& other) {
 }
 // =^^^^^^^^^^^^^= TreeNode ctor`s and optor`s =^^^^^^^^^^^^^= 
 
-// =============== Iterator optor`s  =============== 
+// =============== IteratorAVLTree optor`s  =============== 
 template <typename T>
-AVLTree<T>::Iterator& AVLTree<T>::Iterator::operator++() {
+AVLTree<T>::IteratorAVLTree& AVLTree<T>::IteratorAVLTree::operator++() {
             if (!currentNode_) return *this;
 
             if (currentNode_->right_) {
@@ -46,12 +46,12 @@ AVLTree<T>::Iterator& AVLTree<T>::Iterator::operator++() {
         }
 
 template <typename T>
-AVLTree<T>::Iterator& AVLTree<T>::Iterator::operator++(int) {
-    Iterator temp = *this;
+AVLTree<T>::IteratorAVLTree& AVLTree<T>::IteratorAVLTree::operator++(int) {
+    IteratorAVLTree temp = *this;
     ++(*this);
     return temp;
 }
-// =^^^^^^^^^^^^^= Iterator optor`s =^^^^^^^^^^^^^= 
+// =^^^^^^^^^^^^^= IteratorAVLTree optor`s =^^^^^^^^^^^^^= 
 
 // =============== AVLTree<T> ctor`s and optor`s  =============== 
 template <typename T>

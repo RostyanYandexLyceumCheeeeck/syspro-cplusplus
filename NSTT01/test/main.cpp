@@ -168,8 +168,8 @@ TEST_F(AVLTreeTest, IteratorCorrectly2) {
     
     
     std::sort(arr.begin(), arr.end());
-    std::vector<int>::iterator v_it = arr.begin();
-    std::vector<int>::iterator v_end = arr.end();
+    auto v_it = arr.begin();
+    auto v_end = arr.end();
     
     for (int value : tree) {
         if (v_it == v_end) { ASSERT_FALSE(true); }
