@@ -8,7 +8,7 @@ template <typename T>
 class AVLTree {
 private:
     class TreeNode {
-        T val_ = 0;
+        T val_;
         int height_ = 0;
         TreeNode* left_ = nullptr;
         TreeNode* right_ = nullptr;
@@ -26,14 +26,30 @@ private:
         ~TreeNode() = default;
         friend class AVLTree;
     };
+    
+    class Iterator {
+        TreeNode* currentNode_ = nullptr;
+
+    public:
+        Iterator(TreeNode* node = nullptr) : currentNode_(node) {}
+
+        Iterator& operator++();
+        Iterator& operator++(int);
+        
+        T& operator*() { return currentNode_->val_; }
+        T* operator->() { return &(currentNode_->val_); }
+
+        bool operator==(const Iterator& other) const { return currentNode_ == other.currentNode_; }
+        bool operator!=(const Iterator& other) const { return currentNode_ != other.currentNode_; }
+};
 
     TreeNode* root_ = nullptr;
 
     TreeNode* find(TreeNode* root, T val) const;
     TreeNode* min(TreeNode* root) const;
     TreeNode* max(TreeNode* root) const;
-    TreeNode* predPrivate(TreeNode* node) const;
-    TreeNode* succPrivate(TreeNode* node) const;
+    TreeNode* pred(TreeNode* node) const;
+    TreeNode* succ(TreeNode* node) const;
     TreeNode* insert(TreeNode* root, T val);
     TreeNode* removePrivate(T val);
 
@@ -73,6 +89,9 @@ public:
     int getHeight() const;
     void printTree() const;
     
+    Iterator begin() const { return Iterator(min(root_)); }
+    Iterator end() const { return Iterator(nullptr); }
+
     ~AVLTree();
 };
 

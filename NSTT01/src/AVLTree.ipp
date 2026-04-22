@@ -26,6 +26,33 @@ AVLTree<T>::TreeNode& AVLTree<T>::TreeNode::operator=(TreeNode&& other) {
 }
 // =^^^^^^^^^^^^^= TreeNode ctor`s and optor`s =^^^^^^^^^^^^^= 
 
+// =============== Iterator optor`s  =============== 
+template <typename T>
+AVLTree<T>::Iterator& AVLTree<T>::Iterator::operator++() {
+            if (!currentNode_) return *this;
+
+            if (currentNode_->right_) {
+                currentNode_ = currentNode_->right_;
+                while (currentNode_->left_) {currentNode_ = currentNode_->left_;}   
+            } else {
+                TreeNode* parent = currentNode_->parent_;
+                while (parent && currentNode_ == parent->right_) {
+                    currentNode_ = parent;
+                    parent = parent->parent_;
+                }
+                currentNode_ = parent;
+            }
+            return *this;
+        }
+
+template <typename T>
+AVLTree<T>::Iterator& AVLTree<T>::Iterator::operator++(int) {
+    Iterator temp = *this;
+    ++(*this);
+    return temp;
+}
+// =^^^^^^^^^^^^^= Iterator optor`s =^^^^^^^^^^^^^= 
+
 // =============== AVLTree<T> ctor`s and optor`s  =============== 
 template <typename T>
 AVLTree<T>::AVLTree(AVLTree<T>&& other) {
@@ -73,7 +100,7 @@ AVLTree<T>::TreeNode* AVLTree<T>::max(AVLTree<T>::TreeNode* root) const {
 }
 
 template <typename T>
-AVLTree<T>::TreeNode* AVLTree<T>::predPrivate(AVLTree<T>::TreeNode* node) const {
+AVLTree<T>::TreeNode* AVLTree<T>::pred(AVLTree<T>::TreeNode* node) const {
     if (!node) { return nullptr; }
     
     AVLTree<T>::TreeNode* par_min = node;
@@ -93,7 +120,7 @@ AVLTree<T>::TreeNode* AVLTree<T>::predPrivate(AVLTree<T>::TreeNode* node) const 
 }
 
 template <typename T>
-AVLTree<T>::TreeNode* AVLTree<T>::succPrivate(AVLTree<T>::TreeNode* node) const {
+AVLTree<T>::TreeNode* AVLTree<T>::succ(AVLTree<T>::TreeNode* node) const {
     if (!node) { return nullptr; }
     
     AVLTree<T>::TreeNode* par_max = node;
@@ -314,13 +341,13 @@ T AVLTree<T>::max() const {
 
 template <typename T>
 T AVLTree<T>::pred(T val) const {
-    TreeNode* node = predPrivate(find(root_, val));
+    TreeNode* node = pred(find(root_, val));
     return node ? node->val_ : T{};
 }
 
 template <typename T>
 T AVLTree<T>::succ(T val) const {
-    TreeNode* node = succPrivate(find(root_, val));
+    TreeNode* node = succ(find(root_, val));
     return node ? node->val_ : T{};
 }
 

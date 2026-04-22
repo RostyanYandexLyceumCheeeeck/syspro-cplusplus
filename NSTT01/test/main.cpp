@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <gtest/gtest.h>
 #include "headers/AVLTree.h"
 
@@ -137,6 +138,44 @@ TEST_F(AVLTreeTest, RotationsCorrectly2) {
                                     //    6 ═╗  | ╔═ 10 ═╗
                                     //    |  7  | 9   | 12
 
+
+TEST_F(AVLTreeTest, IteratorCorrectly1) {
+    std::vector<int> arr = {8, 10, 12, 6, 16, 9, 11, 7, 5, 4};
+    for (int x: arr) {          //            ╔════════ 10 ════════╗
+        this->tree.insert(x);   //       ╔═══ 6 ═══╗    ||   ╔═══ 12 ═══╗
+    }                           //    ╔═ 5    | ╔═ 8 ═╗ ||   11   ||   16
+                                //    4  |    | 7  |  9 ||        ||
+    
+    
+    std::sort(arr.begin(), arr.end());
+    auto v_it = arr.begin();
+    auto v_end = arr.end();
+
+    auto t_it = tree.begin();
+    auto t_end = tree.end();
+
+    for (; t_it != t_end, v_it != v_end; ++v_it, ++t_it) {
+        EXPECT_EQ(*t_it, *v_it);
+    }
+}
+
+TEST_F(AVLTreeTest, IteratorCorrectly2) {
+    std::vector<int> arr = {8, 10, 12, 6, 16, 9, 11, 7, 5, 4};
+    for (int x: arr) {          //            ╔════════ 10 ════════╗
+        this->tree.insert(x);   //       ╔═══ 6 ═══╗    ||   ╔═══ 12 ═══╗
+    }                           //    ╔═ 5    | ╔═ 8 ═╗ ||   11   ||   16
+                                //    4  |    | 7  |  9 ||        ||
+    
+    
+    std::sort(arr.begin(), arr.end());
+    std::vector<int>::iterator v_it = arr.begin();
+    std::vector<int>::iterator v_end = arr.end();
+    
+    for (int value : tree) {
+        if (v_it == v_end) { ASSERT_FALSE(true); }
+        EXPECT_EQ(value, *(v_it++));
+    }
+}
 
 int main(int argc, char **argv)
 {
